@@ -23,7 +23,7 @@ use yii\jui\DatePicker;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'document_date')->widget(DatePicker::class, [
-        'dateFormat' => 'php:d.m.Y',
+        'dateFormat' => 'php:y.m.d',
         'language' => 'ru',
         'options' => [
             'placeholder' => 'Дата',
@@ -37,7 +37,7 @@ use yii\jui\DatePicker;
         ]])->label('Дата отправления документа') ?>
 
     <?= $form->field($model, 'sent_date')->widget(DatePicker::class, [
-        'dateFormat' => 'php:d.m.Y',
+        'dateFormat' => 'php:y.m.d',
         'language' => 'ru',
         'options' => [
             'placeholder' => 'Дата',
@@ -112,7 +112,7 @@ use yii\jui\DatePicker;
     <?= $form->field($model, 'document_theme')->textInput(['maxlength' => true])->label('Тема документа') ?>
 
     <?= $form->field($model, 'send_method')->dropDownList(Yii::$app->sendMethods->getList())->label('Способ получения') ?>
-
+    <?= $form->field($model, 'creator_id')->textInput(['maxlength' => true])->label('creator_id') ?>
     <?= $form->field($model, 'key_words')->textInput(['maxlength' => true])->label('Ключевые слова') ?>
     <?= $form->field($model, 'is_answer')->checkbox(['id' => 'needAnswer', 'onchange' => 'checkAnswer()']) ?>
     <div id="dateAnswer" class="col-xs-4" <?= $model->is_answer == 0 ? 'hidden' : '' ?>>

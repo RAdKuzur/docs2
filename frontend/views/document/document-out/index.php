@@ -1,5 +1,4 @@
 <?php
-
 use common\helpers\StringFormatter;
 use common\models\work\document_in_out\DocumentOutWork;
 use common\models\work\document_in_out\InOutDocumentsWork;
@@ -72,16 +71,16 @@ $tempArchive = $session->get("archiveIn");
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'summary' => false,
-            'rowOptions' => function($data) {
+           // 'rowOptions' => function($data) {
                 /** @var InOutDocumentsWork $links */
-                $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
+               /* $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
                 if (!$links) {
                     return ['class' => 'default'];
                 }
                 else {
-                    return $links->getRowClass();
+                    return $links->getInRowClass();
                 }
-            },
+            },*/
             'columns' => [
                 ['attribute' => 'fullNumber'],
                 [
@@ -102,7 +101,7 @@ $tempArchive = $session->get("archiveIn");
                         ]
                     ]),
                     'value' => function(DocumentOutWork $model) {
-                        return date('d.m.y', strtotime($model->local_date));
+                        return date('d.m.y', strtotime($model->document_date));
                     },
                     'encodeLabel' => false,
                 ],
@@ -125,7 +124,7 @@ $tempArchive = $session->get("archiveIn");
                     ]),
                     'encodeLabel' => false,
                     'value' => function(DocumentOutWork $model) {
-                        return date('d.m.y', strtotime($model->real_date));
+                        return date('d.m.y', strtotime($model->sent_date));
                     },
                 ],
                 ['attribute' => 'realNumber', 'encodeLabel' => false],

@@ -30,6 +30,10 @@ class InOutDocumentsWork extends InOutDocuments
     {
         return $this->document_out_id == null;
     }
+    public function isDocumentInEmpty()
+    {
+        return $this->document_in_id == null;
+    }
 
     public function isNoPeopleTarget()
     {
@@ -40,7 +44,18 @@ class InOutDocumentsWork extends InOutDocuments
     {
         return $this->date == null;
     }
-
+    public function getInRowClass()
+    {
+        if ($this->document_in_id !== null) {
+            return ['class' => 'default'];
+        }
+        else if ($this->date !== null && $this->date < date("Y-m-d")) {
+            return ['class' => 'danger'];
+        }
+        else {
+            return ['class' => 'warning'];
+        }
+    }
     public function getRowClass()
     {
         if ($this->document_out_id !== null) {

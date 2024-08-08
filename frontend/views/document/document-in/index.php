@@ -74,7 +74,7 @@ $tempArchive = $session->get("archiveIn");
             'summary' => false,
             'rowOptions' => function($data) {
                 /** @var InOutDocumentsWork $links */
-                $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
+               $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
                 if (!$links) {
                     return ['class' => 'default'];
                 }

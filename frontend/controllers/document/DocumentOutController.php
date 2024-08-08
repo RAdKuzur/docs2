@@ -7,7 +7,7 @@ use common\helpers\SortHelper;
 use common\models\search\SearchDocumentOut;
 use common\models\work\document_in_out\DocumentInWork;
 use common\models\work\document_in_out\DocumentOutWork;
-use common\repositories\document_in_out\DocumentInRepository;
+
 use common\repositories\document_in_out\DocumentOutRepository;
 use common\repositories\general\CompanyRepository;
 use common\repositories\general\FilesRepository;
@@ -18,6 +18,7 @@ use DomainException;
 use frontend\events\document_in\InOutDocumentCreateEvent;
 use frontend\events\document_in\InOutDocumentDeleteEvent;
 use frontend\services\document\DocumentInService;
+use frontend\services\document\DocumentOutService;
 use Yii;
 use yii\web\Controller;
 class DocumentOutController extends Controller
@@ -28,7 +29,7 @@ class DocumentOutController extends Controller
     private CompanyRepository $companyRepository;
     private FileService $fileService;
     private FilesRepository $filesRepository;
-    private DocumentInService $service;
+    private DocumentOutService $service;
 
     public function __construct(
         $id,
@@ -39,7 +40,7 @@ class DocumentOutController extends Controller
         CompanyRepository $companyRepository,
         FileService $fileService,
         FilesRepository $filesRepository,
-        DocumentInService $service,
+        DocumentOutService $service,
         $config = [])
     {
         parent::__construct($id, $module, $config);
@@ -56,6 +57,7 @@ class DocumentOutController extends Controller
     {
         $searchModel = new SearchDocumentOut();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return json_encode($searchModel);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -87,7 +89,7 @@ class DocumentOutController extends Controller
             $this->repository->save($model);
 
             if ($model->needAnswer) {
-                $model->recordEvent(new InOutDocumentCreateEvent($model->id, null, $model->dateAnswer, $model->nameAnswer), DocumentInWork::class);
+                $model->recordEvent(new InOutDocumentCreateEvent($model->id, null, $model->dateAnswer, $model->nameAnswer), DocumentOutWork::class);
             }
 
             $this->service->saveFilesFromModel($model);
