@@ -13,6 +13,34 @@ use yii\helpers\Url;
 
 class DocumentOutWork extends DocumentOut
 {
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'fullNumber' => '№ п/п',
+            'documentDate' => 'Дата <br>документа',
+            'sentDate' => 'Дата отправки<br>документа',
+            'documentNumber' => 'Рег. номер<br>исходящего док.',
+            'companyName' => 'Наименование<br>корреспондента',
+            'documentTheme' => 'Тема документа',
+            'sendMethodName' => 'Способ получения',
+            'needAnswer' => 'Требуется ответ',
+        ]);
+    }
+
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['needAnswer', 'nameAnswer'], 'integer'],
+            [['dateAnswer'], 'string'],
+            [['scanFile'], 'file', 'skipOnEmpty' => true,
+                'extensions' => 'png, jpg, pdf, zip, rar, 7z, tag, txt'],
+            [['docFiles'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 10,
+                'extensions' => 'xls, xlsx, doc, docx, zip, rar, 7z, tag, txt'],
+            [['appFiles'], 'file', 'skipOnEmpty' => true,  'maxFiles' => 10,
+                'extensions' => 'ppt, pptx, xls, xlsx, pdf, png, jpg, doc, docx, zip, rar, 7z, tag, txt'],
+        ]);
+    }
+
     public $needAnswer;
     public $dateAnswer;
     public $scanFile;

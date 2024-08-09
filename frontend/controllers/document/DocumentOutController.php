@@ -57,7 +57,6 @@ class DocumentOutController extends Controller
     {
         $searchModel = new SearchDocumentOut();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return json_encode($searchModel);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

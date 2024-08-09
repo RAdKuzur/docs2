@@ -18,6 +18,9 @@ class SearchDocumentOut extends DocumentOutWork
     public $localDate;
     public $realDate;
     public $realNumber;
+    public $documentNumber;
+    public $documentDate;
+    public $sendDate;
     public $documentTheme;
 
     public $archive;
@@ -28,7 +31,7 @@ class SearchDocumentOut extends DocumentOutWork
     {
         return [
             [['id', 'document_number', 'position_id', 'company_id', 'signed_id', 'executor_id', 'creator_id', 'archive'], 'integer'],
-            [['realNumber', 'fullNumber'], 'string'],
+            [['documentNumber', 'fullNumber'], 'string'],
             [['localDate', 'realDate', 'documentTheme', 'correspondentName', 'companyName', 'sendMethodName'], 'safe'],
         ];
     }
@@ -74,14 +77,14 @@ class SearchDocumentOut extends DocumentOutWork
             'sort'=> ['defaultOrder' => ['document_date' => SORT_DESC, 'document_number' => SORT_DESC, 'document_postfix' => SORT_DESC]]
         ]);
 
-        $dataProvider->sort->attributes['fullNumber'] = [
+        $dataProvider->sort->attributes['documentNumber'] = [
             'asc' => ['document_number' => SORT_ASC, 'document_postfix' => SORT_ASC],
             'desc' => ['document_number' => SORT_DESC, 'document_postfix' => SORT_DESC],
         ];
 
         $dataProvider->sort->attributes['localDate'] = [
-            'asc' => ['document_date' => SORT_ASC],
-            'desc' => ['document_date' => SORT_DESC],
+            'asc' => ['sent_date' => SORT_ASC],
+            'desc' => ['sent_date' => SORT_DESC],
         ];
 
         $dataProvider->sort->attributes['realDate'] = [

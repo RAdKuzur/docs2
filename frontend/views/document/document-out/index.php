@@ -39,9 +39,9 @@ $tempArchive = $session->get("archiveIn");
 
     $gridColumns = [
         ['attribute' => 'fullNumber'],
-        ['attribute' => 'localDate', 'encodeLabel' => false],
-        ['attribute' => 'realDate', 'encodeLabel' => false],
-        ['attribute' => 'realNumber', 'encodeLabel' => false],
+        ['attribute' => 'documentDate', 'encodeLabel' => false],
+        ['attribute' => 'sendDate', 'encodeLabel' => false],
+        ['attribute' => 'documentNumber', 'encodeLabel' => false],
 
         ['attribute' => 'companyName', 'encodeLabel' => false],
         ['attribute' => 'documentTheme', 'encodeLabel' => false],
@@ -71,16 +71,7 @@ $tempArchive = $session->get("archiveIn");
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'summary' => false,
-           // 'rowOptions' => function($data) {
                 /** @var InOutDocumentsWork $links */
-               /* $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
-                if (!$links) {
-                    return ['class' => 'default'];
-                }
-                else {
-                    return $links->getInRowClass();
-                }
-            },*/
             'columns' => [
                 ['attribute' => 'fullNumber'],
                 [
@@ -88,7 +79,7 @@ $tempArchive = $session->get("archiveIn");
                     'filter' => DateRangePicker::widget([
                         'language' => 'ru',
                         'model' => $searchModel,
-                        'attribute' => 'localDate',
+                        'attribute' => 'documentDate',
                         'convertFormat' => true,
                         'pluginOptions' => [
                             'timePicker' => false,
@@ -110,7 +101,7 @@ $tempArchive = $session->get("archiveIn");
                     'filter' => DateRangePicker::widget([
                         'language' => 'ru',
                         'model' => $searchModel,
-                        'attribute' => 'realDate',
+                        'attribute' => 'sendDate',
                         'convertFormat' => true,
                         'pluginOptions' => [
                             'timePicker' => false,
@@ -127,10 +118,25 @@ $tempArchive = $session->get("archiveIn");
                         return date('d.m.y', strtotime($model->sent_date));
                     },
                 ],
-                ['attribute' => 'realNumber', 'encodeLabel' => false],
 
-                ['attribute' => 'companyName', 'encodeLabel' => false],
-                ['attribute' => 'documentTheme', 'encodeLabel' => false],
+                ['attribute' => 'documentNumber',
+
+                    'value' => function(DocumentOutWork $model) {
+                        return $model->document_number;
+                    },
+
+                    'encodeLabel' => false],
+
+                ['attribute' => 'companyName',
+                    'value' => function(DocumentOutWork $model) {
+                        return $model->company_id;
+                    },
+                    'encodeLabel' => false],
+                ['attribute' => 'documentTheme',
+                    'value' => function(DocumentOutWork $model) {
+                        return $model->document_theme;
+                    },
+                    'encodeLabel' => false],
                 [
                     'attribute' => 'sendMethodName',
                     'filter' => Yii::$app->sendMethods->getList(),
