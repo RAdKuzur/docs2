@@ -2,10 +2,10 @@
 
 namespace common\repositories\rac;
 
-use common\models\work\rac\PermissionFunctionWork;
-use common\models\work\rac\PermissionTemplateWork;
-use common\models\work\rac\UserPermissionFunctionWork;
 use DomainException;
+use frontend\models\work\rac\PermissionFunctionWork;
+use frontend\models\work\rac\PermissionTemplateWork;
+use frontend\models\work\rac\UserPermissionFunctionWork;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
@@ -30,7 +30,7 @@ class UserPermissionFunctionRepository
                     UserPermissionFunctionWork::fill(
                         $userId,
                         $function->id,
-                        $branch
+                        Yii::$app->branches->get($branch)
                     )
                 );
             }

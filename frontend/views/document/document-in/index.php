@@ -1,147 +1,114 @@
 <?php
 
+use app\components\VerticalActionColumn;
+use common\helpers\DateFormatter;
+use common\helpers\html\HtmlCreator;
 use common\helpers\StringFormatter;
-use common\models\work\document_in_out\DocumentInWork;
-use common\models\work\document_in_out\InOutDocumentsWork;
+use frontend\helpers\document\DocumentInHelper;
+use frontend\models\work\document_in_out\DocumentInWork;
 use kartik\daterange\DateRangePicker;
 use kartik\export\ExportMenu;
-use kartik\grid\GridViewInterface;
-use yii\helpers\Html;
 use yii\grid\GridView;
-use yii\jui\DatePicker;
+use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\search\SearchDocumentIn */
+/* @var $searchModel \frontend\models\search\SearchDocumentIn */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Входящая документация';
 $this->params['breadcrumbs'][] = $this->title;
 
-$session = Yii::$app->session;
-$tempArchive = $session->get("archiveIn");
 ?>
 <div class="document-in-index">
+    <div class="substrate">
+        <h1><?= Html::encode($this->title) ?></h1>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+        <div class="flexx space">
+            <div class="flexx">
+                <?= DocumentInHelper::createGroupButton(); ?>
 
-    <p>
-        <?= Html::a('Добавить входящий документ', ['create'], ['class' => 'btn btn-success', 'style' => 'display: inline-block;']) ?>
-        <?= Html::a('Добавить резерв', ['document-in/create-reserve'], ['class' => 'btn btn-warning', 'style' => 'display: inline-block;']) ?>
-        <?php
-        if ($tempArchive === null)
-            echo Html::a('Показать архивные документы', ['document-in/index', 'archive' => 1, 'type' => 'button'], ['class' => 'btn btn-secondary', 'style' => 'display: inline-block; background-color: #ededed']);
-        else
-            echo Html::a('Скрыть архивные документы', ['document-in/index', 'type' => 'button'], ['class' => 'btn btn-secondary', 'style' => 'display: inline-block; background-color: #ededed']);
-        ?>
-    </p>
-    <?= $this->render('_search', ['model' => $searchModel]) ?>
+                <div class="export-menu">
+                    <?php
 
-    <?php
+                    $gridColumns = [
+                        ['attribute' => 'fullNumber'],
+                        ['attribute' => 'localDate', 'encodeLabel' => false],
+                        ['attribute' => 'realDate', 'encodeLabel' => false],
+                        ['attribute' => 'realNumber', 'encodeLabel' => false],
 
-    $gridColumns = [
-        ['attribute' => 'fullNumber'],
-        ['attribute' => 'localDate', 'encodeLabel' => false],
-        ['attribute' => 'realDate', 'encodeLabel' => false],
-        ['attribute' => 'realNumber', 'encodeLabel' => false],
+                        ['attribute' => 'companyName', 'encodeLabel' => false],
+                        ['attribute' => 'documentTheme', 'encodeLabel' => false],
+                        ['attribute' => 'sendMethodName', 'value' => 'sendMethod.name'],
+                        ['attribute' => 'needAnswer', 'value' => function(DocumentInWork $model) {
+                            return $model->getNeedAnswerString();
+                        }, 'format' => 'raw'],
 
-        ['attribute' => 'companyName', 'encodeLabel' => false],
-        ['attribute' => 'documentTheme', 'encodeLabel' => false],
-        ['attribute' => 'sendMethodName', 'value' => 'sendMethod.name'],
-        ['attribute' => 'needAnswer', 'value' => function(DocumentInWork $model) {
-            return $model->getNeedAnswer();
-        }, 'format' => 'raw'],
+                    ];
 
-    ];
-    echo '<b>Скачать файл </b>';
-    echo ExportMenu::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => $gridColumns,
+                    echo ExportMenu::widget([
+                        'dataProvider' => $dataProvider,
+                        'columns' => $gridColumns,
 
-        'options' => [
-            'padding-bottom: 100px',
-        ]
-    ]);
+                        'options' => [
+                            'padding-bottom: 100px',
+                        ],
+                    ]);
 
-    ?>
+                    ?>
+                </div>
+            </div>
+
+            <?= HtmlCreator::filterToggle() ?>
+        </div>
+    </div>
+
+    <?= $this->render('_search', ['searchModel' => $searchModel]) ?>
+
     <div style="margin-bottom: 20px">
 
-        <?php echo '<div style="margin-bottom: 10px; margin-top: 20px">'.Html::a('Показать просроченные документы', \yii\helpers\Url::to(['document-in/index', 'sort' => '1'])).
-            ' || '.Html::a('Показать документы, требующие ответа', \yii\helpers\Url::to(['document-in/index', 'sort' => '2'])).
-            ' || '.Html::a('Показать все документы', \yii\helpers\Url::to(['document-in/index'])).'</div>' ?>
-        <?= GridView::widget([
+        <?=
+        GridView::widget([
             'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
             'summary' => false,
-            'rowOptions' => function($data) {
-                /** @var InOutDocumentsWork $links */
-               $links = count($data->inOutDocumentsWork) > 0 ? $data->inOutDocumentsWork[0] : null;
-                if (!$links) {
-                    return ['class' => 'default'];
-                }
-                else {
-                    return $links->getRowClass();
-                }
-            },
+
             'columns' => [
                 ['attribute' => 'fullNumber'],
-                [
-                    'attribute' => 'localDate',
-                    'filter' => DateRangePicker::widget([
-                        'language' => 'ru',
-                        'model' => $searchModel,
-                        'attribute' => 'localDate',
-                        'convertFormat' => true,
-                        'pluginOptions' => [
-                            'timePicker' => false,
-                            'timePickerIncrement' => 365,
-                            'locale' => [
-                                'format' => 'd.m.y',
-                                'cancelLabel' => 'Закрыть',
-                                'applyLabel' => 'Найти',
-                            ]
-                        ]
-                    ]),
-                    'value' => function(DocumentInWork $model) {
-                        return date('d.m.y', strtotime($model->local_date));
+                ['attribute' => 'localDate',
+                    'value' => function(DocumentInWork $model){
+                        return DateFormatter::format($model->local_date, DateFormatter::Ymd_dash, DateFormatter::dmy_dot);
                     },
                     'encodeLabel' => false,
                 ],
-                [
-                    'attribute' => 'realDate',
-                    'filter' => DateRangePicker::widget([
-                        'language' => 'ru',
-                        'model' => $searchModel,
-                        'attribute' => 'realDate',
-                        'convertFormat' => true,
-                        'pluginOptions' => [
-                            'timePicker' => false,
-                            'timePickerIncrement' => 365,
-                            'locale' => [
-                                'format' => 'd.m.y',
-                                'cancelLabel' => 'Закрыть',
-                                'applyLabel' => 'Найти',
-                            ]
-                        ]
-                    ]),
+                ['attribute' => 'realDate',
                     'encodeLabel' => false,
                     'value' => function(DocumentInWork $model) {
-                        return date('d.m.y', strtotime($model->real_date));
+                        return DateFormatter::format($model->real_date, DateFormatter::Ymd_dash, DateFormatter::dmy_dot);
                     },
                 ],
                 ['attribute' => 'realNumber', 'encodeLabel' => false],
 
                 ['attribute' => 'companyName', 'encodeLabel' => false],
                 ['attribute' => 'documentTheme', 'encodeLabel' => false],
-                [
-                    'attribute' => 'sendMethodName',
-                    'filter' => Yii::$app->sendMethods->getList(),
+                ['attribute' => 'sendMethodName',
+                    'value' => function(DocumentInWork $model) {
+                        return Yii::$app->sendMethods->get($model->send_method);
+                    }
                 ],
-                ['attribute' => 'needAnswer', 'value' => function(DocumentInWork $model) {
-                    return $model->getNeedAnswer(StringFormatter::FORMAT_LINK);
-                }, 'format' => 'raw'],
+                ['attribute' => 'needAnswer',
+                    'value' => function(DocumentInWork $model) {
+                        return $model->getNeedAnswerString(StringFormatter::FORMAT_LINK);
+                    },
+                    'format' => 'raw'
+                ],
 
-                ['class' => 'yii\grid\ActionColumn'],
+                ['class' => VerticalActionColumn::class],
             ],
-        ]); ?>
-    </div>
+            'rowOptions' => function ($model) {
+                return ['data-href' => Url::to([Yii::$app->frontUrls::DOC_IN_VIEW, 'id' => $model->id])];
+            },
+        ]);
 
+        ?>
+    </div>
+</div>

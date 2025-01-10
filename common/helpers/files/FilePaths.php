@@ -4,10 +4,8 @@ namespace common\helpers\files;
 
 class FilePaths
 {
-    public const DOCUMENT_IN_SCAN = '@app/upload/files/document-in/scan/';
-    public const DOCUMENT_IN_DOC = '@app/upload/files/document-in/docs/';
-    public const DOCUMENT_IN_APP = '@app/upload/files/document-in/app/';
-    public const DOCUMENT_OUT_SCAN = '@app/upload/files/document-out/scan/';
-    public const DOCUMENT_OUT_DOC = '@app/upload/files/document-out/docs/';
-    public const DOCUMENT_OUT_APP = '@app/upload/files/document-out/app/';
+    public const BASE_FILEPATH = '/upload/files';
+    public const TEMP_FILEPATH = self::BASE_FILEPATH . '/temp';
+    public const EXAMPLE_FILEPATH = '/upload/example';
+    public const EXAMPLE_UTP = self::EXAMPLE_FILEPATH . '/utp-example.xlsx';
 }

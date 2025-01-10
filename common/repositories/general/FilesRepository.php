@@ -2,8 +2,8 @@
 
 namespace common\repositories\general;
 
-use common\models\work\general\FilesWork;
 use DomainException;
+use frontend\models\work\general\FilesWork;
 use Yii;
 use yii\db\Exception;
 
@@ -67,6 +67,24 @@ class FilesRepository
 
         $command = Yii::$app->db->createCommand();
         $command->update($model[0]::tableName(), ['filepath' => $filepath], ['id' => $model[0]->id]);
+
+        return $command->getRawSql();
+    }
+
+    /**
+     * Подготавливает запрос для удаления существующей записи в таблице
+     * @param $id
+     * @return string
+     */
+    public function prepareDelete($id)
+    {
+        $model = $this->getById($id);
+        if (!$model) {
+            throw new Exception('Запись не найдена');
+        }
+
+        $command = Yii::$app->db->createCommand();
+        $command->delete($model::tableName(), ['id' => $id]);
 
         return $command->getRawSql();
     }

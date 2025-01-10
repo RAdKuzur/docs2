@@ -1,13 +1,15 @@
 <?php
 
+use common\widgets\select_search\SelectSearch;
+use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\work\document_in_out\DocumentInWork */
+/* @var $model \frontend\models\work\document_in_out\DocumentInWork */
 /* @var $correspondentList */
 /* @var $availablePositions */
 /* @var $availableCompanies */
@@ -41,8 +43,8 @@ use yii\jui\DatePicker;
         'language' => 'ru',
         'options' => [
             'placeholder' => 'Дата',
-            'class'=> 'form-control',
-            'autocomplete'=>'off'
+            'class' => 'form-control',
+            'autocomplete' => 'off'
         ],
         'clientOptions' => [
             'changeMonth' => true,
@@ -50,9 +52,7 @@ use yii\jui\DatePicker;
             'yearRange' => '2000:2100',
         ]])->label('Дата входящего документа') ?>
 
-
     <?= $form->field($model, 'real_number')->textInput()->label('Регистрационный номер входящего документа') ?>
-
 
     <?php
 
@@ -63,20 +63,27 @@ use yii\jui\DatePicker;
             "' . Url::toRoute('dependency-dropdown') . '", 
             {id: $(this).val()}, 
             function(res){
+                console.log(res);
                 var resArr = res.split("|split|");
                 var elem = document.getElementsByClassName("pos");
                 elem[0].innerHTML = resArr[0];
                 elem = document.getElementsByClassName("com");
                 elem[0].innerHTML = resArr[1];
+                $("#company").trigger("change");
+                $("#position").trigger("change");
             }
         );
     ',
     ];
 
-    echo $form
-        ->field($model, "correspondent_id")
-        ->dropDownList(ArrayHelper::map($correspondentList, 'id', 'fullFio'),$params)
-        ->label('ФИО корреспондента');
+    echo $form->field($model, 'correspondent_id')->widget(Select2::classname(), [
+        'data' => ArrayHelper::map($mainCompanyWorkers,'id','fullFio'),
+        'size' => Select2::LARGE,
+        'options' => $params,
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+    ])->label('ФИО корреспондента');
 
     ?>
 
@@ -87,10 +94,15 @@ use yii\jui\DatePicker;
             'class' => 'form-control com',
             'prompt' => '---',
         ];
-        echo $form
-            ->field($model, 'company_id')
-            ->dropDownList(ArrayHelper::map($availableCompanies, 'id', 'name'), $params)
-            ->label('Организация корреспондента');
+
+        echo $form->field($model, 'company_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map($availableCompanies, 'id', 'name'),
+            'size' => Select2::LARGE,
+            'options' => $params,
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ])->label('Организация корреспондента');
         ?>
     </div>
 
@@ -101,13 +113,17 @@ use yii\jui\DatePicker;
             'class' => 'form-control pos',
             'prompt' => '---',
         ];
-        echo $form
-            ->field($model, 'position_id')
-            ->dropDownList(ArrayHelper::map($availablePositions, 'id', 'name'), $params)
-            ->label('Должность корреспондента (при наличии)');
+
+        echo $form->field($model, 'position_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map($availablePositions, 'id', 'name'),
+            'size' => Select2::LARGE,
+            'options' => $params,
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ])->label('Должность корреспондента (при наличии)');
         ?>
     </div>
-
 
     <?= $form->field($model, 'document_theme')->textInput(['maxlength' => true])->label('Тема документа') ?>
 
@@ -134,60 +150,41 @@ use yii\jui\DatePicker;
     <div id="nameAnswer" class="col-xs-4" <?= $model->needAnswer == 0 ? 'hidden' : '' ?>>
         <?php
         $params = [
-            'prompt' => ''
+            'prompt' => '---'
         ];
-        echo $form->field($model, "nameAnswer")
-            ->dropDownList(
-                ArrayHelper::map($mainCompanyWorkers,'id','fullFio'),
-                $params
-            )
-            ->label('ФИО ответственного');
 
+        echo $form->field($model, 'nameAnswer')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map($mainCompanyWorkers,'id','fullFio'),
+            'size' => Select2::LARGE,
+            'options' => $params,
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ])->label('ФИО ответственного');
         ?>
     </div>
     <div class="panel-body" style="padding: 0; margin: 0"></div>
     <?= $form->field($model, 'scanFile')->fileInput()
         ->label('Скан документа') ?>
 
-    <?php if (is_array($scanFile) && count($scanFile) > 0): ?>
-        <table class="table table-bordered">
-        <?php foreach ($scanFile as $file): ?>
-            <tr>
-                <td><?= Html::a(basename($file->filepath), Url::to(['get-file', 'filepath' => $file->filepath])) ?></td>
-                <td><?= Html::a('Удалить', Url::to(['delete-file', 'modelId' => $model->id, 'fileId' => $file->id])) ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </table>
+    <?php if (strlen($scanFile) > 10): ?>
+        <?= $scanFile; ?>
     <?php endif; ?>
 
     <?= $form->field($model, 'docFiles[]')
         ->fileInput(['multiple' => true])
         ->label('Редактируемые документы') ?>
 
-    <?php if (is_array($docFiles) && count($docFiles) > 0): ?>
-        <table class="table table-bordered">
-            <?php foreach ($docFiles as $file): ?>
-                <tr>
-                    <td><?= Html::a(basename($file->filepath), Url::to(['get-file', 'filepath' => $file->filepath])) ?></td>
-                    <td><?= Html::a('Удалить', Url::to(['delete-file', 'modelId' => $model->id, 'fileId' => $file->id])) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+    <?php if (strlen($docFiles) > 10): ?>
+        <?= $docFiles; ?>
     <?php endif; ?>
 
     <?= $form->field($model, 'appFiles[]')
         ->fileInput(['multiple' => true])
         ->label('Приложения') ?>
 
-    <?php if (is_array($appFiles) && count($appFiles) > 0): ?>
-        <table class="table table-bordered">
-            <?php foreach ($appFiles as $file): ?>
-                <tr>
-                    <td><?= Html::a(basename($file->filepath), Url::to(['get-file', 'filepath' => $file->filepath])) ?></td>
-                    <td><?= Html::a('Удалить', Url::to(['delete-file', 'modelId' => $model->id, 'fileId' => $file->id])) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+    <?php if (strlen($appFiles) > 10): ?>
+        <?= $appFiles; ?>
     <?php endif; ?>
 
     <div class="form-group">

@@ -5,13 +5,11 @@ namespace common\helpers\files\filenames;
 use common\helpers\DateFormatter;
 use common\helpers\files\FilesHelper;
 use common\helpers\StringFormatter;
-use common\models\work\document_in_out\DocumentInWork;
-use common\models\work\general\FilesWork;
 use common\repositories\general\FilesRepository;
-use common\services\general\files\FileService;
 use DomainException;
+use frontend\models\work\document_in_out\DocumentOutWork;
+use frontend\models\work\general\FilesWork;
 use InvalidArgumentException;
-use ZipStream\File;
 
 class DocumentOutFileNameGenerator implements FileNameGeneratorInterface
 {
@@ -78,38 +76,38 @@ class DocumentOutFileNameGenerator implements FileNameGeneratorInterface
             throw new DomainException('Параметр \'counter\' обязателен');
         }
 
-        /** @var DocumentInWork $object */
-        $date = $object->local_date;
+        /** @var DocumentOutWork $object */
+        $date = $object->document_date;
         $new_date = DateFormatter::format($date, DateFormatter::Ymd_dash, DateFormatter::Ymd_without_separator);
 
         if ($object->companyWork->short_name !== '') {
             $filename =
-                'Ред'.($this->getOrdinalFileNumberDoc($object) + $params['counter']).
-                '_Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
+                'Ред'.($this->getOrdinalFileNumber($object, FilesHelper::TYPE_DOC) + $params['counter']).
+                '_Исх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
         }
         else {
             $filename =
-                'Ред'.($this->getOrdinalFileNumberDoc($object) + $params['counter']).
-                '_Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
+                'Ред'.($this->getOrdinalFileNumber($object, FilesHelper::TYPE_DOC) + $params['counter']).
+                '_Исх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
         }
         $res = mb_ereg_replace('[ ]{1,}', '_', $filename);
         $res = mb_ereg_replace('[^а-яА-Я0-9._]{1}', '', $res);
         $res = StringFormatter::CutFilename($res);
 
-        return $res . '.' . $object->docFiles[$params['counter'] - 1]->extension;
+        return $res . '.' . $object->docFile[$params['counter'] - 1]->extension;
     }
 
     private function generateScanFileName($object, $params = [])
     {
-        /** @var DocumentInWork $object */
-        $date = $object->local_date;
+        /** @var DocumentOutWork $object */
+        $date = $object->document_date;
         $new_date = DateFormatter::format($date, DateFormatter::Ymd_dash, DateFormatter::Ymd_without_separator);
 
         if ($object->companyWork->short_name !== '') {
-            $filename = 'Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
+            $filename = 'Исх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
         }
         else {
-            $filename = 'Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
+            $filename = 'Исх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
         }
         $res = mb_ereg_replace('[ ]{1,}', '_', $filename);
         $res = mb_ereg_replace('[^а-яА-Я0-9._]{1}', '', $res);
@@ -124,20 +122,20 @@ class DocumentOutFileNameGenerator implements FileNameGeneratorInterface
             throw new DomainException('Параметр \'counter\' обязателен');
         }
 
-        /** @var DocumentInWork $object */
-        $date = $object->local_date;
+        /** @var DocumentOutWork $object */
+        $date = $object->document_date;
         $new_date = DateFormatter::format($date, DateFormatter::Ymd_dash, DateFormatter::Ymd_without_separator);
 
         if ($object->company->short_name !== '') {
-            $filename = 'Приложение'.($this->getOrdinalFileNumberApp($object) + $params['counter']).'_Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
+            $filename = 'Приложение'.($this->getOrdinalFileNumber($object, FilesHelper::TYPE_APP) + $params['counter']).'_Вх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->short_name.'_'.$object->document_theme;
         }
         else {
-            $filename = 'Приложение'.($this->getOrdinalFileNumberApp($object) + $params['counter']).'_Вх.'.$new_date.'_'.$object->local_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
+            $filename = 'Приложение'.($this->getOrdinalFileNumber($object, FilesHelper::TYPE_APP) + $params['counter']).'_Вх.'.$new_date.'_'.$object->document_number.'_'.$object->companyWork->name.'_'.$object->document_theme;
         }
         $res = mb_ereg_replace('[ ]{1,}', '_', $filename);
         $res = mb_ereg_replace('[^а-яА-Я0-9._]{1}', '', $res);
         $res = StringFormatter::CutFilename($res);
 
-        return $res . '.' . $object->appFiles[$params['counter'] - 1]->extension;
+        return $res . '.' . $object->appFile[$params['counter'] - 1]->extension;
     }
 }

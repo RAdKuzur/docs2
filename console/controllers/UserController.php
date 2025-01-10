@@ -2,9 +2,8 @@
 
 namespace console\controllers;
 
-use common\models\LoginForm;
-use common\models\work\general\UserWork;
 use common\repositories\general\UserRepository;
+use frontend\models\work\general\UserWork;
 use Yii;
 use yii\console\Controller;
 
@@ -13,10 +12,10 @@ class UserController extends Controller
     private UserRepository $userRepository;
 
     public function __construct(
-        $id,
-        $module,
+                       $id,
+                       $module,
         UserRepository $userRepository,
-        $config = [])
+                       $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->userRepository = $userRepository;
@@ -27,7 +26,7 @@ class UserController extends Controller
         $splitFio = [];
 
         while (count($splitFio) < 2) {
-            $fio = $this->prompt('Введите ФИО пользователя через пробел:');
+            $fio = $this->prompt('Введите ФИО пользователя через пробел (на латинице):');
             $splitFio = explode(' ', $fio);
         }
 

@@ -19,6 +19,8 @@ namespace common\models\scaffold;
  * @property string|null $genitive_surname
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property int|null $created_id
+ * @property int|null $last_edit_id
  *
  * @property Company $company
  * @property DocumentIn[] $documentIns
@@ -46,8 +48,8 @@ class People extends \yii\db\ActiveRecord
     {
         return [
             [['firstname', 'surname'], 'required'],
-            [['company_id', 'position_id', 'branch', 'sex'], 'integer'],
-            [['birthdate', 'created_at', 'updated_at'], 'safe'],
+            [['company_id', 'position_id', 'branch', 'sex', 'creator_id', 'last_edit_id'], 'integer'],
+            [['birthdate', 'created_at', 'updated_at', 'id'], 'safe'],
             [['firstname', 'surname', 'patronymic', 'genitive_surname'], 'string', 'max' => 256],
             [['short'], 'string', 'max' => 10],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],

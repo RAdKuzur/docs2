@@ -2,7 +2,7 @@
 
 namespace frontend\events\document_in;
 
-use frontend\events\EventInterface;
+use common\events\EventInterface;
 use common\repositories\document_in_out\InOutDocumentsRepository;
 use Yii;
 
@@ -36,10 +36,6 @@ class InOutDocumentCreateEvent implements EventInterface
 
     public function execute()
     {
-        if ($this->repository->getByDocumentInId($this->documentInId)) {
-            return [];
-        }
-
         return [
             $this->repository->prepareCreate(
                 $this->documentInId,

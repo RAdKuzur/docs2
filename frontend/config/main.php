@@ -15,9 +15,15 @@ return [
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
         ],
+        'gii' => [
+            'class' => 'yii\gii\Module',
+        ]
     ],
     'components' => [
         'request' => [
+            'enableCookieValidation' => true,
+            'enableCsrfValidation' => true,
+            'cookieValidationKey' => 'your-validation-key',
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [

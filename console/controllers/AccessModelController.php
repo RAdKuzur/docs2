@@ -2,16 +2,10 @@
 
 namespace console\controllers;
 
-use common\models\LoginForm;
-use common\models\work\rac\UserPermissionFunctionWork;
-use common\repositories\general\UserRepository;
+use common\components\access\AuthDataCache;
 use common\repositories\rac\UserPermissionFunctionRepository;
 use Exception;
-use Yii;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use yii\console\Controller;
-use yii\web\Response;
 
 /**
  * Site controller
@@ -19,15 +13,18 @@ use yii\web\Response;
 class AccessModelController extends Controller
 {
     private UserPermissionFunctionRepository $userFunctionRepository;
+    private AuthDataCache $authCache;
 
     public function __construct(
-        $id,
-        $module,
+                                         $id,
+                                         $module,
         UserPermissionFunctionRepository $userFunctionRepository,
-        $config = [])
+                           AuthDataCache $authCache,
+                                         $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->userFunctionRepository = $userFunctionRepository;
+        $this->authCache = $authCache;
     }
 
     //-----------------------------------------------
@@ -39,7 +36,7 @@ class AccessModelController extends Controller
         );
 
         $userId = $this->prompt('Введите ID пользователя:');
-        $branch = $this->prompt('Введите отдел для правила (techno, quant, cdntt, cod, mob_quant) или оставьте пустым:');
+        $branch = $this->prompt('Введите отдел для правила (1 - Технопарк, 2 - Кванториум, 3 - ЦДНТТ, 4 - ЦОД, 5 - Моб. Кванториум, 6 - Планетарий, 7 - Администрация) или оставьте пустым:');
 
         $hasException = false;
         try {
@@ -52,6 +49,7 @@ class AccessModelController extends Controller
 
         if (!$hasException) {
             echo "Права успешно назначены пользователю";
+            $this->authCache->clearAuthData($userId);
         }
     }
 }

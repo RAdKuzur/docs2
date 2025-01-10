@@ -24,12 +24,12 @@ namespace common\models\scaffold;
  * @property int|null $is_answer
  *
  * @property Company $company
- * @property People $correspondent
+ * @property PeopleStamp $correspondent
  * @property User $creator
- * @property People $executor
+ * @property PeopleStamp $executor
  * @property User $lastEdit
  * @property Position $position
- * @property People $signed
+ * @property PeopleStamp $signed
  */
 class DocumentOut extends \yii\db\ActiveRecord
 {
@@ -47,17 +47,17 @@ class DocumentOut extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['document_number', 'document_date', 'document_name', 'document_theme', 'sent_date', 'creator_id'], 'required'],
+            [['document_number', 'document_date', 'document_name', 'document_theme', 'sent_date'], 'required'],
             [['document_number', 'document_postfix', 'correspondent_id', 'position_id', 'company_id', 'signed_id', 'executor_id', 'send_method', 'creator_id', 'last_edit_id', 'is_answer'], 'integer'],
             [['document_date', 'sent_date'], 'safe'],
             [['document_name'], 'string', 'max' => 64],
             [['document_theme'], 'string', 'max' => 256],
             [['key_words'], 'string', 'max' => 512],
-            [['correspondent_id'], 'exist', 'skipOnError' => true, 'targetClass' => People::class, 'targetAttribute' => ['correspondent_id' => 'id']],
+            [['correspondent_id'], 'exist', 'skipOnError' => true, 'targetClass' => PeopleStamp::class, 'targetAttribute' => ['correspondent_id' => 'id']],
             [['position_id'], 'exist', 'skipOnError' => true, 'targetClass' => Position::class, 'targetAttribute' => ['position_id' => 'id']],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
-            [['signed_id'], 'exist', 'skipOnError' => true, 'targetClass' => People::class, 'targetAttribute' => ['signed_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => People::class, 'targetAttribute' => ['executor_id' => 'id']],
+            [['signed_id'], 'exist', 'skipOnError' => true, 'targetClass' => PeopleStamp::class, 'targetAttribute' => ['signed_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => PeopleStamp::class, 'targetAttribute' => ['executor_id' => 'id']],
             [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
             [['last_edit_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['last_edit_id' => 'id']],
         ];
@@ -106,7 +106,7 @@ class DocumentOut extends \yii\db\ActiveRecord
      */
     public function getCorrespondent()
     {
-        return $this->hasOne(People::class, ['id' => 'correspondent_id']);
+        return $this->hasOne(PeopleStamp::class, ['id' => 'correspondent_id']);
     }
 
     /**
@@ -126,7 +126,7 @@ class DocumentOut extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(People::class, ['id' => 'executor_id']);
+        return $this->hasOne(PeopleStamp::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -156,6 +156,14 @@ class DocumentOut extends \yii\db\ActiveRecord
      */
     public function getSigned()
     {
-        return $this->hasOne(People::class, ['id' => 'signed_id']);
+        return $this->hasOne(PeopleStamp::class, ['id' => 'signed_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInOutDocument()
+    {
+        return $this->hasMany(InOutDocuments::class, ['document_out_id' => 'id']);
     }
 }

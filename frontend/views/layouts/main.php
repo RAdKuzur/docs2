@@ -11,6 +11,7 @@ use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -21,12 +22,22 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <?php //$this->registerCssFile('@web/vendor/fortawesome/font-awesome/css/all.min.css'); ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
 <header>
     <?php
+    if (Yii::$app->rac->isGuest()) {
+        $menuItems[] = ['label' => 'Войти', 'url' => ['/auth/login']];
+    }
+    else {
+        $menuItems[] = ['label' => 'Личный кабинет', 'url' => ['/user/lk/info', 'id' => Yii::$app->user->identity->getId()]];
+        $menuItems[] = ['label' => 'Выйти', 'url' => ['/auth/logout']];
+    }
+
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
@@ -35,29 +46,57 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => 'Входящая документация', 'url' => ['/document/document-in/index']],
-        ['label' => 'Исходящая документация', 'url' => ['/document/document-out/index']],
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
+        [
+            'label' => 'Документооборот',
+            'items' => [
+                ['label' => 'Входящая документация', 'url' => ['/document/document-in/index']],
+                ['label' => 'Исходящая документация', 'url' => ['/document/document-out/index']],
+                ['label' => 'Приказы по осн. деятельности', 'url' => ['/order/order-main/index']],
+                ['label' => 'Приказы по обр. деятельности', 'url' => ['/order/order-training/index']],
+                ['label' => 'Приказы по мероприятиям', 'url' => ['/order/order-event/index']],
+                ['label' => 'Положения', 'url' => ['/regulation/regulation/index']],
+                ['label' => 'Положения о мероприятиях', 'url' => ['/regulation/regulation-event/index']],
+                ['label' => 'Мероприятия', 'url' => ['/event/our-event/index']],
+                ['label' => 'Учет ответственности работников', 'url' => ['/responsibility/local-responsibility/index']],
+            ],
+        ],
+        [
+            'label' => 'Учебная деятельность',
+            'items' => [
+                ['label' => 'Образовательные программы', 'url' => ['/educational/training-program/index']],
+                ['label' => 'Учебные группы', 'url' => ['/educational/training-group/index']],
+            ],
+        ],
+        [
+            'label' => 'Справочники',
+            'items' => [
+                ['label' => 'Люди', 'url' => ['/dictionaries/people/index']],
+                ['label' => 'Организации', 'url' => ['/dictionaries/company/index']],
+                ['label' => 'Должности', 'url' => ['/dictionaries/position/index']],
+                ['label' => 'Участники деятельности', 'url' => ['/dictionaries/foreign-event-participants/index']],
+                ['label' => 'Помещения', 'url' => ['/dictionaries/auditorium/index']],
+            ],
+        ],
+        [
+            'label' => Yii::$app->user->isGuest ? 'Профиль' : 'Профиль (' . Yii::$app->user->identity->username . ')',
+            'items' => $menuItems,
+        ]
     ];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-    }
 
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],
         'items' => $menuItems,
     ]);
-    if (Yii::$app->user->isGuest) {
-        echo Html::tag('div',Html::a('Login',['/site/login'],['class' => ['btn btn-link login text-decoration-none']]),['class' => ['d-flex']]);
+    /*if (Yii::$app->rac->isGuest()) {
+        echo Html::tag('div',Html::a('Войти',['/auth/login'],['class' => ['btn btn-link login text-decoration-none']]),['class' => ['d-flex']]);
     } else {
-        echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
+        echo Html::beginForm(['/auth/logout'], 'post', ['class' => 'd-flex'])
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                'Выйти (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout text-decoration-none']
             )
             . Html::endForm();
-    }
+    }*/
     NavBar::end();
     ?>
 </header>
@@ -81,5 +120,7 @@ AppAsset::register($this);
 
 <?php $this->endBody() ?>
 </body>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"  defer></script>
 </html>
 <?php $this->endPage();

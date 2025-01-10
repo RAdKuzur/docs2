@@ -2,6 +2,7 @@
 
 namespace common\helpers;
 
+use PhpOffice\PhpSpreadsheet\Reader\Xls\MD5;
 use yii\helpers\Html;
 
 class StringFormatter
@@ -43,5 +44,30 @@ class StringFormatter
         }
 
         return $string;
+    }
+
+    public static function getLastSegmentBySlash($string) {
+        $lastSlashPos = strrpos($string, '/');
+
+        if ($lastSlashPos !== false) {
+            return substr($string, $lastSlashPos + 1);
+        }
+
+        return $string;
+    }
+
+    public static function getLastSegmentByBackslash($string) {
+        $lastSlashPos = strrpos($string, '\\');
+
+        if ($lastSlashPos !== false) {
+            return substr($string, $lastSlashPos + 1);
+        }
+
+        return $string;
+    }
+
+    public static function createHash(string $str)
+    {
+        return MD5($str);
     }
 }
